@@ -28,7 +28,7 @@ app.use(morgan("dev"));
 app.use(helmet());
 app.use(cors({ origin: appOrigin }));
 
-const checkJwt = jwt({
+const checkGOGJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
@@ -41,9 +41,33 @@ const checkJwt = jwt({
   algorithms: ["RS256"],
 });
 
-app.get("/api/external", checkJwt, (req, res) => {
+const checkPassportJwt = jwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`,
+  }),
+
+  audience: authConfig.audience,
+  issuer: `https://${authConfig.domain}/`,
+  algorithms: ["RS256"],
+});
+
+app.get("/api/external", checkPassportJwt, async (req, res) => {
+  return res.send({ success: "ok" });
+});
+
+app.get("/api/getStatus", checkGOGJwt, (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
   res.send({
-    msg: "Your access token was successfully validated!",
+    chapter: 9,
+    step: 2,
+    scene: "Hit the Boss",
+    time: "1:10",
+    GOGToken: token,
   });
 });
 

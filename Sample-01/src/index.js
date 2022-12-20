@@ -20,6 +20,7 @@ const config = getConfig();
 const providerConfig = {
   domain: config.domain,
   clientId: config.clientId,
+  scope: config.scope,
   ...(config.audience ? { audience: config.audience } : null),
   redirectUri: window.location.origin,
   onRedirectCallback,
